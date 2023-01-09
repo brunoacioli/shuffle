@@ -28,7 +28,7 @@ def run_client(client_sock):
             if shuffle:
                 test = sendrecv_dict(client_sock, {"id": player_id, "op": "SHUFFLE", "msg": msg})
                 shuffle = False
-            print("test: ",test)
+                print("test: ",test)
             if test['op'] == "SHUFFLING":
                 if test["status"] == False:
                     while True:
