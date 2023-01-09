@@ -7,10 +7,13 @@ HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 PORT = 65432
 
 player_id = 0
+shuffle = False
+flag = False
 
 
 def run_client(client_sock):
     global player_id
+    global shuffle
     while True:
         print(player_id)
         if player_id == 0:
@@ -18,30 +21,33 @@ def run_client(client_sock):
             test = sendrecv_dict(client_sock, {"op": "START", "msg": "teste"})
             print("$$$$$", test)
             player_id = test["id"]
+            shuffle = True
         else:
             print("else")
             msg = "player %d" % player_id
-            test = sendrecv_dict(client_sock, {"id": player_id, "op": "SHUFFLE", "msg": msg})
+            if shuffle:
+                test = sendrecv_dict(client_sock, {"id": player_id, "op": "SHUFFLE", "msg": msg})
+                shuffle = False
             print("test: ",test)
             if test['op'] == "SHUFFLING":
                 if test["status"] == False:
                     while True:
-                        test = sendrecv_dict(client_sock, {"id": player_id, "op": "SHUFFLING", "msg": msg})
+                        test = sendrecv_dict(client_sock, {"id": player_id, "op": "SHUFFLING", "status": test["status"]})
                         if test["status"]:
                             break
-
-                answer = sendrecv_dict(client_sock, {"id": player_id, "op": "SHUFFLING"})
-            
-                
-                print("!!!! " ,answer)
-                deck_shuffled = answer["deck"].copy()
-                random.shuffle(deck_shuffled)
-                print(deck_shuffled)
-                answer["op"] = "SHUFFLING"
-                answer["deck"] = deck_shuffled
-                answer["status"] = True
-                answer = sendrecv_dict(client_sock, answer)
-                print("## ",answer)
+        
+            answer = sendrecv_dict(client_sock, {"id": player_id, "op": "SHUFFLING", "status": test["status"]})
+    
+        
+            print("!!!! " ,answer)
+            deck_shuffled = answer["deck"].copy()
+            random.shuffle(deck_shuffled)
+            print(deck_shuffled)
+            answer["op"] = "SHUFFLED"
+            answer["deck"] = deck_shuffled
+            answer["status"] = True
+            answer = sendrecv_dict(client_sock, answer)
+            print("## ",answer)
 
 def main(args):
     
