@@ -36,18 +36,19 @@ def run_client(client_sock):
                         if test["status"]:
                             break
         
-            answer = sendrecv_dict(client_sock, {"id": player_id, "op": "SHUFFLING", "status": test["status"]})
+            
+                answer = sendrecv_dict(client_sock, {"id": player_id, "op": "SHUFFLING", "status": test["status"]})
     
         
-            print("!!!! " ,answer)
-            deck_shuffled = answer["deck"].copy()
-            random.shuffle(deck_shuffled)
-            print(deck_shuffled)
-            answer["op"] = "SHUFFLED"
-            answer["deck"] = deck_shuffled
-            answer["status"] = True
-            answer = sendrecv_dict(client_sock, answer)
-            print("## ",answer)
+                print("!!!! " ,test)
+                deck_shuffled = test["deck"].copy()
+                random.shuffle(deck_shuffled)
+                print(deck_shuffled)
+                test["op"] = "SHUFFLED"
+                test["deck"] = deck_shuffled
+                test["status"] = True
+                answer = sendrecv_dict(client_sock, test)
+                print("## ",answer)
 
 def main(args):
     

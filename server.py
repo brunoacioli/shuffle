@@ -44,11 +44,13 @@ def shuffle_cards(client_sock, id, past_deck=None):
         if not past_deck:
             print("not past deck")
             send_dict(client_sock, {
-                      "id": id, "op": "SHUFFLING", "status": True, "deck": deck})
+                      "id": id, "op": "SHUFFLED", "status": True, "deck": deck})
+            send_dict(players_list[id+1]["sock"], {
+                "id": id, "op": "SHUFFLED", "status": True})
         else:
             print("past deck")
             send_dict(client_sock, {
-                      "id": id, "op": "SHUFFLING", "status": True, "deck": past_deck})
+                      "id": id, "op": "SHUFFLED", "status": True, "deck": past_deck})
     else:
         send_dict(client_sock, {"id": id, "op": "SHUFFLING", "status": False})
 
@@ -84,9 +86,11 @@ def new_msg(client_sock):
         shuffle_cards(client_sock, msg["id"])
     elif msg["op"] == "SHUFFLING" and not msg["status"]:
         if players_list[msg["id"]-1]["shuffled_array"] != []:
+            print("oi")
             shuffle_cards(
                 client_sock, msg["id"], players_list[msg["id"]-1]["shuffled_array"])
         else:
+            print("tchau")
             send_dict(client_sock, {
                       "id": msg["id"], "op": "SHUFFLING", "status": False})
     elif msg["op"] == "SHUFFLED" and msg["deck"]:
